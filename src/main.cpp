@@ -101,6 +101,8 @@ void LoadData(std::ifstream& in_file,
       measurement.value << rho, phi, rho_dot;
       measurement.timestamp = timestamp;
       measurement_sequence.push_back(measurement);
+    } else {
+      continue;
     }
 
     // Read ground truth data to compare later
@@ -218,6 +220,31 @@ Eigen::VectorXf CalculateRmse(
   return rmse;
 }
 
+void GetKthHigestNis(
+  const MeasurementSequence& measurement_sequence,
+  const EstimateSequence& estimate_sequence,
+  size_t k,
+  float& lidarNis,
+  float& radarNis) {
+
+  assert(measurement_sequence.size() == estimate_sequence.size());
+  assert(k < estimate_sequence.size());
+  std::vector<float> lidarNisSequence;
+  std::vector<float> radarNisSequence;
+  for (auto i = 0; i < measurement_sequence.size(); ++i) {
+    if (measurement_sequence[i].sensor_type
+        == UkfTracker::Measurement::SensorType::kLidar) {
+      lidarNisSequence.push_back(estimate_sequence[i].nis);
+    } else {
+      radarNisSequence.push_back(estimate_sequence[i].nis);
+    }
+  }
+  std::sort(lidarNisSequence.rbegin(), lidarNisSequence.rend());
+  std::sort(radarNisSequence.rbegin(), radarNisSequence.rend());
+  lidarNis = lidarNisSequence[k];
+  radarNis = radarNisSequence[k];
+}
+
 // main
 // -----------------------------------------------------------------------------
 
@@ -254,6 +281,17 @@ int main(int argc, char* argv[]) {
   if (out_file.is_open()) {
     out_file.close();
   }
+
+  // NIS
+  float lidarNis = 0;
+  float radarNis = 0;
+  GetKthHigestNis(measurement_sequence,
+                  estimate_sequence,
+                  estimate_sequence.size() * 0.05,
+                  lidarNis,
+                  radarNis);
+  std::cout << "5\% of NIS estimates is higher than "
+            << lidarNis << " (lidar), " << radarNis << " (radar)" << std::endl;
 
   // Compute the accuracy (RMSE)
   std::cout << "RMSE" << std::endl;

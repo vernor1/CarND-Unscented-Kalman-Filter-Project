@@ -26,11 +26,11 @@ const float kLambdaAug = 3 - kNaug;
 
 // Process noise standard deviation longitudinal acceleration in m/s^2
 // TODO: adjust
-const float kStdA = .3;
+const float kStdA = 1.2;
 
 // Process noise standard deviation yaw acceleration in rad/s^2
 // TODO: adjust
-const float kStdYaw = .3;
+const float kStdYaw = .6;
 
 // Augmented covariance dimension
 const unsigned short kNq = 2;
@@ -374,6 +374,8 @@ void UkfTracker::Update(const Eigen::VectorXf& z,
 //  std::cout << "k" << std::endl << k << std::endl;
   // Measurement difference
   Eigen::VectorXf z_diff = z - z_pred;
+  nis_ = z_diff.transpose() * s.inverse() * z_diff;
+//  std::cout << "NIS" << std::endl << nis_ << std::endl;
   // Angle normalization
   while (z_diff(1) > M_PI) {
     z_diff(1) -= 2. * M_PI;
