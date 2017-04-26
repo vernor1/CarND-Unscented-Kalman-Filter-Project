@@ -35,7 +35,7 @@ public:
   virtual ~UkfTracker() { }
 
   // Processes a single measurement and returns the estimate at x+1
-  // @param[in] measurement The measurement data
+  // @param[in] measurement  The measurement data
   // @return Estimate
   Estimate operator()(const Measurement& measurement);
 
@@ -52,26 +52,23 @@ private:
   // State covariance matrix
   Eigen::MatrixXf p_;
 
-  // NIS
-  float nis_;
-
   // Predicts the state and the state covariance using the process model
-  // @param[in] dt Time between k and k+1 in s
+  // @param[in] dt  Time between k and k+1 in s
+  // @param[out] Predicted sigma points
   void Predict(float dt, Eigen::MatrixXf& x_sig_pred);
 
-  void Update(const Eigen::VectorXf& z,
-              const Eigen::MatrixXf& x_sig_pred,
-              const Eigen::MatrixXf& z_sig,
-              const Eigen::VectorXf& z_pred,
-              const Eigen::MatrixXf& s);
-
-  // Updates the state by using standard Kalman Filter equations
-  // @param[in] z The measurement at k+1
-//  void LidarUpdate(const Eigen::VectorXf& z);
-
-  // Updates the state by using Extended Kalman Filter equations
-  // @param[in] z The measurement at k+1
-//  void RadarUpdate(const Eigen::VectorXf& z);
+  // Updates the state by using Unscented Kalman Filter equations
+  // @param[in] x_sig_pred  Predicted sigma points
+  // @param[in] z           Measurement data
+  // @param[in] z_sig       Sigma points in measurement space
+  // @param[in] z_pred      Predicted measurement mean
+  // @param[in] s           Predicted measurement covariance
+  // @return NIS
+  float Update(const Eigen::MatrixXf& x_sig_pred,
+               const Eigen::VectorXf& z,
+               const Eigen::MatrixXf& z_sig,
+               const Eigen::VectorXf& z_pred,
+               const Eigen::MatrixXf& s);
 };
 
 #endif // UKF_TRACKER_H_

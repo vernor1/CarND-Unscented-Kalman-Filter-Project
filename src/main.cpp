@@ -16,8 +16,8 @@ typedef std::vector<Eigen::VectorXf> GroundTruthSequence;
 // -----------------------------------------------------------------------------
 
 // Checks arguments of the program and exits if the check fails.
-// @param[in] argc Number of arguments
-// @param[in] argc Array of arguments
+// @param[in] argc  Number of arguments
+// @param[in] argc  Array of arguments
 void CheckArguments(int argc, char* argv[]) {
   std::string usage_instructions = "Usage instructions: ";
   usage_instructions += argv[0];
@@ -44,10 +44,10 @@ void CheckArguments(int argc, char* argv[]) {
 }
 
 // Checks input and output files and exits if the check fails.
-// @param[in] in_file       Input file
-// @param[in] in_file_name  Input file name
-// @param[in] out_file      Output file
-// @param[in] out_file_name Output file name
+// @param[in] in_file        Input file
+// @param[in] in_file_name   Input file name
+// @param[in] out_file       Output file
+// @param[in] out_file_name  Output file name
 void CheckFiles(const std::ifstream& in_file,
                 const std::string& in_file_name,
                 const std::ofstream& out_file,
@@ -64,9 +64,9 @@ void CheckFiles(const std::ifstream& in_file,
 }
 
 // Loads input data.
-// @param[in] in_file               Input file
-// @param[out] measurement_sequence  Container for measurements data
-// @param[out] ground_truth_sequence Container for ground truth data
+// @param[in]  in_file                Input file
+// @param[out] measurement_sequence   Container for measurements data
+// @param[out] ground_truth_sequence  Container for ground truth data
 void LoadData(std::ifstream& in_file,
               MeasurementSequence& measurement_sequence,
               GroundTruthSequence& ground_truth_sequence) {
@@ -118,10 +118,10 @@ void LoadData(std::ifstream& in_file,
 }
 
 // Dumps all estimates, measurements and ground truth data to a file.
-// @param[in]  measurement_sequence  Container with measurements data
-// @param[in]  ground_truth_sequence Container with ground truth data
-// @param[in]  estimate_sequence   Container with esimations data
-// @param[out] out_file              Output file
+// @param[in]  measurement_sequence   Container with measurements data
+// @param[in]  ground_truth_sequence  Container with ground truth data
+// @param[in]  estimate_sequence      Container with esimations data
+// @param[out] out_file               Output file
 void DumpData(const EstimateSequence& estimate_sequence,
               const MeasurementSequence& measurement_sequence,
               const GroundTruthSequence& ground_truth_sequence,
@@ -184,8 +184,8 @@ void DumpData(const EstimateSequence& estimate_sequence,
 }
 
 // Calculates RMSE of the estimates and ground truth data.
-// @param[in] estimate_sequence   Container with esimations data
-// @param[in] ground_truth_sequence Container with ground truth data
+// @param[in] estimate_sequence      Container with esimations data
+// @param[in] ground_truth_sequence  Container with ground truth data
 // @return The Eigen vector containing the RMSE values for px, py, vs, vy
 Eigen::VectorXf CalculateRmse(
   const EstimateSequence& estimate_sequence,
@@ -249,7 +249,6 @@ void GetKthHigestNis(
 // -----------------------------------------------------------------------------
 
 int main(int argc, char* argv[]) {
-
   CheckArguments(argc, argv);
 
   // Open and check files

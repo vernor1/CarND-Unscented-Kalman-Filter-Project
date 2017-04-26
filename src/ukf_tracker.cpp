@@ -1,5 +1,4 @@
 #include "ukf_tracker.h"
-#include <iostream>
 
 namespace {
 
@@ -124,7 +123,7 @@ void NormalizeAngle(float& a) {
 Eigen::MatrixXf GenerateSigmaPoints(size_t n_sig,
                                     const Eigen::VectorXf& x,
                                     const Eigen::MatrixXf& p) {
-  size_t n_x = x.size();
+  auto n_x = x.size();
   // Create sigma point matrix
   Eigen::MatrixXf x_sig(n_x, n_sig);
   // Set the first sigma point to the state mean
@@ -190,8 +189,7 @@ UkfTracker::UkfTracker()
   : is_initialized_(false),
     previous_timestamp_(-1),
     x_(Eigen::VectorXf::Zero(kNx)),
-    p_(kPinitial),
-    nis_(0) { }
+    p_(kPinitial) { }
 
 UkfTracker::Estimate UkfTracker::operator()(const Measurement& measurement) {
   if (!is_initialized_) {
@@ -212,9 +210,7 @@ UkfTracker::Estimate UkfTracker::operator()(const Measurement& measurement) {
     previous_timestamp_ = measurement.timestamp;
     is_initialized_ = true;
 
-//    std::cout << "x0" << std::endl << x_ << std::endl;
-//    std::cout << "P0" << std::endl << p_ << std::endl;
-    return Estimate(x_, nis_);
+    return Estimate(x_, 0);
   }
 
   // Time elapsed between the current and previous measurements in seconds
@@ -236,10 +232,9 @@ UkfTracker::Estimate UkfTracker::operator()(const Measurement& measurement) {
   }
 
   // Update state mean and covariance
-  Update(measurement.value, x_sig_pred, z_sig, z_pred, s);
-//  std::cout << "x" << std::endl << x_ << std::endl;
-//  std::cout << "P" << std::endl << p_ << std::endl;
-  return Estimate(x_, nis_);
+  auto nis = Update(x_sig_pred, measurement.value, z_sig, z_pred, s);
+
+  return Estimate(x_, nis);
 }
 
 // Private Members
@@ -310,17 +305,17 @@ void UkfTracker::Predict(float dt, Eigen::MatrixXf& x_sig_pred) {
   //     product += v(i) * m1.col(i) * m2.col(i).transpose();
   //   }
   // When all occurences of such multiplication are replaced with the loop,
-  // the completion  time over 8000 samples is about 3.2s (on an Intel i7). The
-  // current vectorized completion time is 2.3s. It must be a result of the
+  // the completion  time over 8000 samples is about 3s (on an Intel i7). The
+  // current vectorized completion time is 2.1s. It must be a result of the
   // optimal Eigen matrix multiplication algorithm.
   p_ = diff * kAugWeights.asDiagonal() * diff.transpose();
 }
 
-void UkfTracker::Update(const Eigen::VectorXf& z,
-                        const Eigen::MatrixXf& x_sig_pred,
-                        const Eigen::MatrixXf& z_sig,
-                        const Eigen::VectorXf& z_pred,
-                        const Eigen::MatrixXf& s) {
+float UkfTracker::Update(const Eigen::MatrixXf& x_sig_pred,
+                         const Eigen::VectorXf& z,
+                         const Eigen::MatrixXf& z_sig,
+                         const Eigen::VectorXf& z_pred,
+                         const Eigen::MatrixXf& s) {
   // Differences of state sigma points
   Eigen::MatrixXf x_diffs = x_sig_pred.colwise() - x_;
   for (auto i = 0; i < kNsigAug; ++i) {
@@ -341,6 +336,6 @@ void UkfTracker::Update(const Eigen::VectorXf& z,
   // Update state mean and covariance matrix
   x_ += k * z_diff;
   p_ -= k * s * k.transpose();
-  // Compute NIS
-  nis_ = z_diff.transpose() * s.inverse() * z_diff;
+  // Return NIS
+  return z_diff.transpose() * s.inverse() * z_diff;
 }
