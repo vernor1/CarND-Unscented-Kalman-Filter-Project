@@ -282,7 +282,7 @@ int main(int argc, char* argv[]) {
     out_file.close();
   }
 
-  // NIS
+  // NIS estimation
   float lidarNis = 0;
   float radarNis = 0;
   GetKthHigestNis(measurement_sequence,
