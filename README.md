@@ -25,7 +25,7 @@ The code compiles without errors with cmake-3.7.2 and make-3.81 on macOS-10.12.4
 The computationally stable RMSE on `obj_pose-laser-radar-synthetic-input.txt` is `[0.0655022, 0.0817954, 0.148616, 0.208478]`. 5% of NIS estimates are higher than 3.942 (lidar), 6.12856 (radar) - it's well correlating with the Chi-squared distribution for df=2 (5.991) and df=3 (7.815) respectively. Changing the process noise standard deviation of longitudinal (1 m/s^2) and yaw (Pi/5 rad/s^2) acceleration only decreases the overall accuracy.
 
 <p align="center">
-    <img src="./data/sample_plot.png" alt="Sample Plot" width="500"/>
+    <img src="./data/sample_plot.png" alt="Sample Plot" width="800"/>
 </p>
 
 
