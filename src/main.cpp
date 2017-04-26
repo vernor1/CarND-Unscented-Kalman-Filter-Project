@@ -289,7 +289,7 @@ int main(int argc, char* argv[]) {
                   estimate_sequence.size() * 0.05,
                   lidarNis,
                   radarNis);
-  std::cout << "5\% of NIS estimates is higher than "
+  std::cout << "5\% of NIS estimates are higher than "
             << lidarNis << " (lidar), " << radarNis << " (radar)" << std::endl;
 
   // Compute the accuracy (RMSE)
