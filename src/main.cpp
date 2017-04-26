@@ -206,10 +206,10 @@ Eigen::VectorXf CalculateRmse(
     // Convert UKF x vector to cartesian to compare to ground truth
     Eigen::VectorXf ukf_x_cartesian(4);
 
-    float x_estimate = ukf_x(0);
-    float y_estimate = ukf_x(1);
-    float vx_estimate = ukf_x(2) * std::cos(ukf_x(3));
-    float vy_estimate = ukf_x(2) * std::sin(ukf_x(3));
+    auto x_estimate = ukf_x(0);
+    auto y_estimate = ukf_x(1);
+    auto vx_estimate = ukf_x(2) * std::cos(ukf_x(3));
+    auto vy_estimate = ukf_x(2) * std::sin(ukf_x(3));
     
     ukf_x_cartesian << x_estimate, y_estimate, vx_estimate, vy_estimate;
     rmse = rmse.array()
