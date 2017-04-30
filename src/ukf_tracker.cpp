@@ -120,6 +120,13 @@ void NormalizeAngle(float& a) {
   }
 }
 
+template<typename T>
+void NormalizeAngles(T v) {
+  for (auto i = 0; i < v.size(); ++i) {
+    NormalizeAngle(v(i));
+  }
+}
+
 Eigen::MatrixXf GenerateSigmaPoints(size_t n_sig,
                                     const Eigen::VectorXf& x,
                                     const Eigen::MatrixXf& p) {
@@ -141,12 +148,9 @@ void PredictLidarMeasurement(const Eigen::MatrixXf& x_sig_pred,
                              Eigen::MatrixXf& z_sig,
                              Eigen::VectorXf& z_pred,
                              Eigen::MatrixXf& s) {
-  // Create matrix for sigma points in measurement space
-  z_sig = Eigen::MatrixXf(kNzLidar, kNsigAug);
-  // Transform sigma points into measurement space
-  for (auto i = 0; i < kNsigAug; ++i) {
-    z_sig.col(i) = x_sig_pred.col(i).head(kNzLidar);
-  }
+  // Create matrix for sigma points in measurement space and transform sigma
+  // points into measurement space
+  z_sig = x_sig_pred.block(0, 0, kNzLidar, kNsigAug);
   // Calculate mean predicted measurement
   z_pred = z_sig * kAugWeights;
   // Calculate measurement covariance matrix S
@@ -292,9 +296,7 @@ void UkfTracker::Predict(float dt, Eigen::MatrixXf& x_sig_pred) {
   // Predict state covariance matrix
   Eigen::MatrixXf diff(kNx, kNsigAug);
   diff = x_sig_pred.colwise() - x_;
-  for (auto i = 0; i < kNsigAug; ++i) {
-    NormalizeAngle(diff(3, i));
-  }
+  NormalizeAngles(diff.row(3));
   // Even though turning the weights vector into a diagonal matrix before the
   // multiplication might seem inefficient, but this vectorized multiplication
   // below shows a significantly better performance, than an explicit loop over
@@ -318,14 +320,10 @@ float UkfTracker::Update(const Eigen::MatrixXf& x_sig_pred,
                          const Eigen::MatrixXf& s) {
   // Differences of state sigma points
   Eigen::MatrixXf x_diffs = x_sig_pred.colwise() - x_;
-  for (auto i = 0; i < kNsigAug; ++i) {
-    NormalizeAngle(x_diffs(3, i));
-  }
+  NormalizeAngles(x_diffs.row(3));
   // Differences of measurement sigma points
   Eigen::MatrixXf z_diffs = z_sig.colwise() - z_pred;
-  for (auto i = 0; i < kNsigAug; ++i) {
-    NormalizeAngle(z_diffs(1, i));
-  }
+  NormalizeAngles(z_diffs.row(1));
   // Create matrix for cross correlation Tc
   Eigen::MatrixXf tc = x_diffs * kAugWeights.asDiagonal() * z_diffs.transpose();
   // Calculate Kalman gain K;
