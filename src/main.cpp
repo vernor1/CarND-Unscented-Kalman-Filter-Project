@@ -17,7 +17,7 @@ typedef std::vector<Eigen::VectorXf> GroundTruthSequence;
 
 // Checks arguments of the program and exits if the check fails.
 // @param[in] argc  Number of arguments
-// @param[in] argc  Array of arguments
+// @param[in] argv  Array of arguments
 void CheckArguments(int argc, char* argv[]) {
   std::string usage_instructions = "Usage instructions: ";
   usage_instructions += argv[0];
