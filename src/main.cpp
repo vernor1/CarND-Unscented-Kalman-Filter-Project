@@ -220,7 +220,13 @@ Eigen::VectorXf CalculateRmse(
   return rmse;
 }
 
-void GetKthHigestNis(
+// Returns the k-th highest NIS estimate for lidar and radar.
+// @param[in]  measurement_sequence  Container with measurements data
+// @param[in]  estimate_sequence     Container with esimations data
+// @param[in]  k                     Order of the NIS estimate
+// @param[out] lidarNis              k-th NIS estimate value for lidar
+// @param[out] radarNis              k-th NIS estimate value for radar
+void GetKthHighestNis(
   const MeasurementSequence& measurement_sequence,
   const EstimateSequence& estimate_sequence,
   size_t k,
@@ -284,7 +290,7 @@ int main(int argc, char* argv[]) {
   // NIS estimation
   float lidarNis = 0;
   float radarNis = 0;
-  GetKthHigestNis(measurement_sequence,
+  GetKthHighestNis(measurement_sequence,
                   estimate_sequence,
                   estimate_sequence.size() * 0.05,
                   lidarNis,
